@@ -38,7 +38,12 @@ class BundleController extends Controller
     }
     public function readAllBundles(){
         try{
-            $bundles =Bundle::all();
+            $bundles = Bundle::join('categories','bundles.category_id','=','categories.id')
+            ->select('bundles.*','categories.name as category_name')
+            ->get();
+
+
+
             return response()->json($bundles);
         }
         catch(\Exception $exception){
@@ -50,7 +55,12 @@ class BundleController extends Controller
         }
         public function readBundle($id){
             try{
-                $bundle =Bundle::findOrFail($id);
+                            $bundle = Bundle::join('categories','bundles.category_id','=','categories.id')
+            ->select('bundles.*','categories.name as category_name')
+            ->where('bundles.id',$id)
+            ->first();
+            
+                $bundle = Bundle::findOrFail($id);
                 return response()->json($bundle);
             }
             catch(\Exception $exception){

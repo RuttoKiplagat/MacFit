@@ -31,6 +31,7 @@ class CategoryController extends Controller
     }
     public function readAllCategories(){
         try{
+            
             $categories = Category::all();
             return response()->json($categories);
         }

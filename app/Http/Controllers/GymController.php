@@ -33,7 +33,7 @@ class GymController extends Controller
         }
 
     }
-    public function readAllGyms(){
+public function readAllGyms(){
         try{
             $gyms = Gym::all();
             return response()->json($gyms);
@@ -59,7 +59,7 @@ class GymController extends Controller
         }
         public function updateGym(Request $request, $id){
               $validated = $request->validate([
-            'name' => 'required|string',
+                'name' => 'required|string',
             'longitude' => 'required|string',
             'latitude' => 'required|string',
             'description' => 'string|max:1000',
