@@ -11,11 +11,11 @@ class BundleController extends Controller
     public function createBundle(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|unique:bundles,name',
             'start_time' => 'required',
             'duration' => 'required',
             'category_id' => 'integer|exists:categories,id',
-            'description' => 'string|max:1000',
+            'description' => 'required|string|max:1000',
         ]);
         $bundle = new Bundle();
         $bundle->name = $validated['name'];

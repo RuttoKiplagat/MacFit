@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\subscription;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
-{      public function createSubscription(Request $request)
-    {
-        $validated = $request->validate([
-            'user_id' => 'required|string',
-            'bundle_id' => 'required|string',
+{
+public function createSubscription(Request $request)
+{
+    $validated = $request->validate([
+        
+        'bundle_id' => 'required|integer|exists:bundles,id',
 
-        ]);
-        $subscription = new Subscription();
-        $subscription->user_id = $validated['user_id'];
+    ]);
+    $user_id = $request->user()->id;
+    $subscription = new Subscription();
+    $subscription->user_id = $user_id;
         $subscription->bundle_id = $validated['bundle_id'];
 
         try{
@@ -90,4 +92,22 @@ class SubscriptionController extends Controller
                 ]);
             }
         }
+    public function getUserCharges(){
+        $user = auth()->user() ?? auth('api')->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $userId = $user->id;
+
+        $total = Subscription::query()
+        ->where('subscriptions.user_id', $user->id)
+        ->join('bundles', 'subscriptions.bundle_id', '=', 'bundles.id')
+        ->sum('bundles.value');
+
+        return response()->json([
+            'user_id' => $user->id,
+            'total' => (float) $total,
+            'currency' => 'KES',
+        ]);
+    }
 }

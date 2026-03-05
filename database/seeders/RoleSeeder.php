@@ -22,7 +22,7 @@ class RoleSeeder extends Seeder
             'description' => 'This is a user'
         ]);
           Role::create([
-            'name' => 'trainer',
+            'name' => 'Trainer',
             'description' => 'This is a trainer'
         ]);
           Role::create([

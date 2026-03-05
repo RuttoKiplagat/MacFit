@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('bundles', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->dateTime('start_time');
             $table->time('duration');
             $table->string('description', 1000);
+            $table->double('value');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->timestamps();

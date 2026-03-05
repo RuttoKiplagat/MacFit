@@ -8,9 +8,10 @@ class Role extends Model
 {
     protected $fillable = [
         'name',
-        'start_time',
-        'duration',
-        'description',
-        'category_id'
+        'description'
     ];
+
+    public function use(){
+        $this->hasMany(User::class);
+    }
 }
