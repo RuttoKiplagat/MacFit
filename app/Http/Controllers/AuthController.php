@@ -21,7 +21,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:40',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:4|max:15|confirmed',
+            'password' => 'required|string|min:4|max:15',
             'user_image' => 'nullable|image|max:255|mimes:jpg,jpeg,png',
             'is_active' => 'boolean',
             'role_id' => 'required|integer|exists:roles,id',
@@ -40,6 +40,7 @@ class AuthController extends Controller
         $user->email = $validated['email'];
         $user->role_id = $role_id;
         $user->password = Hash::make($validated['password']);
+        $user->is_activate=true;
         
 
         if ($request->hasFile('user_image')) {
@@ -52,19 +53,19 @@ class AuthController extends Controller
         
         try {
             $user->save();
-             $signedUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            [
-                'id' => $user->id, 
-            'hash' => sha1($user->email)
-            ]
-        );
+        //     $signedUrl = URL::temporarySignedRoute(
+         //   'verification.verify',
+         //   now()->addMinutes(60),
+        //    [
+        //        'id' => $user->id, 
+        //    'hash' => sha1($user->email)
+        //    ]
+       // );
 
-        $user->notify(new VerifyEmailNotification($signedUrl));
-        return response()->json([
-            'message' => 'Verification email resent successfully.'
-        ], 200);
+        //$user->notify(new VerifyEmailNotification($signedUrl));
+        //return response()->json([
+       //     'message' => 'Verification email resent successfully.'
+       // ], 200);
        
 
         } catch (\Exception $exception) {
@@ -95,23 +96,29 @@ class AuthController extends Controller
                     'message' => 'Your account is inactive. Please verify your email address.'
                 ], 403);
             }
-            $otp = rand(100000, 999999);
-            $expiresAt = now()->addMinutes(5);
+           //$otp = rand(100000, 999999);
+            //$expiresAt = now()->addMinutes(5);
 
-            UserOtp::updateOrCreate([
-                'user_id'=>$user->id,
-                'otp'=>$otp,
-                'expires_at'=>$expiresAt
-            ]);
+            //UserOtp::updateOrCreate([
+             //   'user_id'=>$user->id,
+            //    'otp'=>$otp,
+            //    'expires_at'=>$expiresAt
+            //]);
 
-            Mail::to($user->email)->send(new OtpMail($otp));
+            //Mail::to($user->email)->send(new OtpMail($otp));
 
             
 
-            return response()->json([
-                'message' => 'OTP sent to your email. Please verify login',
+           // return response()->json([
+           //     'message' => 'OTP sent to your email. Please verify login',
       
-            ], 201);
+            //], 201);
+        $token = $user ->createToken("ayth-token")->plainTextToken;
+        return response()->json([
+            'message'=>'Login Successful!',
+            'token'=>$token,
+            'user'=>$user,
+        ], 201);
 
         } catch (\Exception $exception) {
             return response()->json([
