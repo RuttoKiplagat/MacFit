@@ -23,7 +23,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:4|max:15',
             'user_image' => 'nullable|image|max:255|mimes:jpg,jpeg,png',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|in:true,false,1,0,yes,no',
             'role_id' => 'required|integer|exists:roles,id',
         ]);
         if ($request->role_id) {
@@ -40,7 +40,7 @@ class AuthController extends Controller
         $user->email = $validated['email'];
         $user->role_id = $role_id;
         $user->password = Hash::make($validated['password']);
-        $user->is_activate=true;
+        $user->is_active = filter_var($request->is_active ?? true, FILTER_VALIDATE_BOOLEAN);
         
 
         if ($request->hasFile('user_image')) {
@@ -53,19 +53,19 @@ class AuthController extends Controller
         
         try {
             $user->save();
-        //     $signedUrl = URL::temporarySignedRoute(
-         //   'verification.verify',
-         //   now()->addMinutes(60),
-        //    [
-        //        'id' => $user->id, 
-        //    'hash' => sha1($user->email)
-        //    ]
-       // );
+             $signedUrl = URL::temporarySignedRoute(
+           'verification.verify',
+           now()->addMinutes(60),
+            [
+                'id' => $user->id, 
+            'hash' => sha1($user->email)
+            ]
+       );
 
-        //$user->notify(new VerifyEmailNotification($signedUrl));
-        //return response()->json([
-       //     'message' => 'Verification email resent successfully.'
-       // ], 200);
+        $user->notify(new VerifyEmailNotification($signedUrl));
+        return response()->json([
+            'message' => 'Verification email resent successfully.'
+        ], 200);
        
 
         } catch (\Exception $exception) {

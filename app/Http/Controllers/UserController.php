@@ -2,97 +2,113 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\User;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
-class UserController extends Controller
+class UserController  extends Controller
 {
-        public function createUser(Request $request)
-        {
-            $validated = $request->validate([
-                'name' => 'required|string',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:6',
-            ]);
-    
-            try {
-                $user = new User();
-                $user->name = $validated['name'];
-                $user->email = $validated['email'];
-                $user->password = bcrypt($validated['password']);
-                $user->save();
-    
-                return response()->json($user, 201);
-            } catch (\Exception $exception) {
-                return response()->json([
-                    'error' => 'Failed to create user',
-                    'message' => $exception->getMessage()
-                ], 500);
-            }
-        }
-        public function readAllUsers(){
-        try{
-            $users = User::all();
-            return response()->json($users);
-        }
-        catch(\Exception $exception){
-            return response()->json([
-                'error' => 'failed to fetch users',
-                'message' => $exception->getMessage()
-            ]);
-        }
-        }
-        public function readUser($id){
-            try{
-                $user = User::findOrFail($id);
-                return response()->json($user);
-            }
-            catch(\Exception $exception){
-                return response()->json([
-                    'error' => 'failed to fetch user',                    
-                    'message' => $exception->getMessage()
-                ]);
-            }
-        }
-        public function updateUser(Request $request, $id){
-            $validated = $request->validate([
-                'name' => 'required|string',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:6',
-        ]);
-                $user = new User();
-                $user->name = $validated['name'];
-                $user->email = $validated['email'];
-                $user->password = bcrypt($validated['password']);
-                $user->save();
-            try{
-                $user = User::findOrFail($id);
-                $user->name = $validated['name'];
-                $user->email = $validated['email'];
-                $user->password = bcrypt($validated['password']);
-                $user->save();
-                return response()->json($user);
-            }
-            catch(\Exception $exception){
-                return response()->json([
-                    'error' => 'failed to update user',
-                    'message' => $exception->getMessage()
-                ]);
-            }
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $users = User::all();
+        return response()->json($users);
+    }
 
-        }
-        public function deleteUser($id){
-            try{
-                $user = User::findOrFail($id);
-                $user->delete();
-                return response("User deleted succesfully");
-            }
-            catch(\Exception $exception){
-                return response()->json([
-                    
-                    'error' => 'failed to delete user',
-                    'message' => $exception->getMessage()
-                ]);
-            }
-        }
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+      $validated = $request->validate([
+            'name'=>'required|string',
+            'email'=>'required|email|unique:users,email',
+            'phoneNumber'=>'nullable|string',
+            'gender'=>'nullable|string',
+            'dob'=>'nullable|string',
+            'gymLocation'=>'nullable|string',
+            'role_id'=>'required|integer|exists:roles,id',
+        ]);
+
+        $user = new User();
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make('Qwerty1234');
+        $user->role_id = $validated['role_id'];
+        $user->phoneNumber = $validated['phoneNumber'];
+        $user->county = $validated['gender'];
+        $user->dob = $validated['dob'];
+        $user->gym_location = $validated['gymLocation'];
+        $user->is_active = true; //to delete later after email verification
+
+        $user->save();
+
+        return response()->json(['message' => 'Role Saved Successfully.'], 200);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        
+      $validated = $request->validate([
+            'name'=>'required|string',
+            'email'=>'required|email',
+            'phoneNumber'=>'nullable|string',
+            'gender'=>'nullable|string',
+            'dob'=>'nullable|string',
+            'gymLocation'=>'nullable|string',
+            'role_id'=>'required|integer|exists:roles,id',
+        ]);
+
+        $user = User::find($id);
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make('Qwerty1234');
+        $user->role_id = $validated['role_id'];
+        $user->phoneNumber = $validated['phoneNumber'];
+        $user->county = $validated['gender'];
+        $user->dob = $validated['dob'];
+        $user->gym_location = $validated['gymLocation'];
+        $user->is_active = true; //to delete later after email verification
+
+        $user->save();
+
+        return response()->json(['message' => 'User updated Successfully.'], 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
 }

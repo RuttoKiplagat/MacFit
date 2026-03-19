@@ -73,10 +73,6 @@ Route::middleware('auth:sanctum')->group (function() {
     Route::post('/updateSubscription/{id}', [SubscriptionController::class, 'updateSubscription']);
     Route::delete('/deleteSubscription/{id}', [SubscriptionController::class, 'deleteSubscription']);
     
-    Route::post('/saveUser', [UserController::class, 'createUser']);
-    Route::get('/getUsers', [UserController::class, 'readAllUsers']);
-    Route::get('/getUser/{id}', [UserController::class, 'readUser']);
-    Route::post('/updateUser/{id}', [UserController::class, 'updateUser']);
-    Route::delete('/deleteUser/{id}', [UserController::class, 'deleteUser']);
+    Route::resource('users', UserController::class);
 
 });
